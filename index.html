@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#e9efe8" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="GLA:D Log" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>GLA:D Trainingslog – testversie 0.2</title>
+</head>
+<body>
+  <div id="app">
+    <section id="lockScreen" class="screen center hidden">
+      <div class="card lock-card">
+        <h1>GLA:D Trainingslog</h1>
+        <p>Voer je pincode in.</p>
+        <input id="pinLogin" class="big-input" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="Pincode" />
+        <button id="unlockBtn" class="primary">Open app</button>
+        <p id="pinError" class="error"></p>
+      </div>
+    </section>
+
+    <section id="setupScreen" class="screen center hidden">
+      <div class="card setup-card">
+        <h1>Welkom</h1>
+        <p>Vul je gegevens in. Deze blijven lokaal op dit apparaat.</p>
+        <label>Naam<input id="setupName" class="big-input" type="text" autocomplete="name" /></label>
+        <label>Geboortedatum<input id="setupDob" class="big-input" type="date" /></label>
+        <label>Kies pincode<input id="setupPin" class="big-input" type="password" inputmode="numeric" minlength="4" maxlength="8" placeholder="4–8 cijfers" /></label>
+        <button id="finishSetup" class="primary">Start</button>
+        <p id="setupError" class="error"></p>
+      </div>
+    </section>
+
+    <main id="mainApp" class="hidden">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">GLA:D • testversie 0.2</div>
+          <h1>Trainingslog</h1>
+        </div>
+        <button id="manualSave" class="secondary small">Opslaan</button>
+      </header>
+
+      <nav class="tabs" aria-label="Hoofdnavigatie">
+        <button class="tab active" data-tab="today">Vandaag</button>
+        <button class="tab" data-tab="stats">Statistiek</button>
+        <button class="tab" data-tab="export">Export</button>
+        <button class="tab" data-tab="settings">Instellingen</button>
+      </nav>
+
+      <section id="today" class="tabpanel active">
+        <div class="card date-card">
+          <label>Trainingsdatum<input id="sessionDate" type="date" /></label>
+          <label>Algemene pijn vóór training
+            <select id="painBefore" class="pain-select"></select>
+          </label>
+        </div>
+
+        <div id="painLegend" class="pain-legend"></div>
+        <div class="card warmup-card"><h2>Opwarmen</h2><p>Het handboek beschrijft 10 minuten fietsen op de hometrainer, met individueel ingestelde weerstand richting een waargenomen inspanning van “enigszins zwaar”.</p><div class="grid2"><label>Minuten<input id="warmupMinutes" type="number" min="0" max="30" value="10"></label><label>Waargenomen inspanning<select id="warmupEffort"><option value="">–</option><option>Licht</option><option>Enigszins zwaar</option><option>Zwaar</option></select></label></div></div><div id="guidanceAlert" class="guidance-alert hidden"></div><div id="exerciseList"></div>
+
+        <div class="card followup-card">
+          <h2>Reactie na de training</h2>
+          <div class="grid2"><label>Pijn direct na training<select id="painAfter" class="pain-select"></select></label>
+            <label>Pijn later op de dag<select id="painLater" class="pain-select"></select></label>
+            <label>Pijn de volgende dag<select id="painNextDay" class="pain-select"></select></label>
+          </div><label class="checkline"><input id="pain24h" type="checkbox"> Verhoogde pijn houdt langer dan 24 uur aan</label>
+          <label>Opmerking<textarea id="sessionNote" rows="3" placeholder="Bijv. stijfheid, napijn, slapen, lopen…"></textarea></label>
+          <button id="saveSession" class="primary">Trainingsdag opslaan</button>
+          <div id="saveStatus" class="save-status">Nog niet opgeslagen</div>
+        </div>
+      </section>
+
+      <section id="stats" class="tabpanel">
+        <div class="card">
+          <div class="section-head"><h2>Voortgang</h2><select id="statsRange"><option value="28">4 weken</option><option value="56">8 weken</option><option value="9999">Alles</option></select></div>
+          <div class="metric-grid">
+            <div class="metric"><span id="mSessions">0</span><small>sessies</small></div>
+            <div class="metric"><span id="mAvgPain">–</span><small>gem. pijn</small></div>
+            <div class="metric"><span id="mAvgLevel">–</span><small>gem. niveau</small></div>
+            <div class="metric"><span id="mNextPain">–</span><small>volgende dag</small></div>
+          </div>
+        </div>
+        <div class="card"><h3>Niveau tegenover pijnniveau</h3><canvas id="levelPainChart" width="800" height="360"></canvas></div>
+        <div class="card"><h3>Pijn per datum</h3><canvas id="painDateChart" width="800" height="360"></canvas></div>
+        <div class="card"><h3>Score per oefening</h3><div id="exerciseScores"></div></div>
+        <div class="card"><h3>Voortgang per week</h3><div id="weeklyProgress"></div></div>
+      </section>
+
+      <section id="export" class="tabpanel">
+        <div class="card">
+          <h2>Weekrapport voor begeleider</h2>
+          <p>Bevat alleen trainingsdatum, oefening, niveau, pijnscores en korte opmerkingen.</p>
+          <label>Week van<input id="exportWeek" type="date" /></label>
+          <button id="previewExport" class="secondary">Voorbeeld bekijken</button>
+          <button id="downloadExport" class="primary">Exporteer CSV</button>
+          <button id="shareExport" class="secondary">Deel rapport</button>
+          <pre id="exportPreview" class="preview"></pre>
+        </div>
+        <div class="card">
+          <h3>Back-up</h3>
+          <p>Maak een volledige back-up van je lokale gegevens of herstel die later.</p>
+          <button id="backupBtn" class="secondary">Volledige back-up</button>
+          <label class="file-label">Back-up herstellen<input id="restoreFile" type="file" accept="application/json" /></label>
+        </div>
+      </section>
+
+      <section id="settings" class="tabpanel">
+        <div class="card">
+          <h2>Profiel</h2>
+          <label>Naam<input id="profileName" type="text" /></label>
+          <label>Geboortedatum<input id="profileDob" type="date" /></label>
+          <button id="saveProfile" class="secondary">Profiel opslaan</button>
+        </div>
+        <div class="card"><h2>Pijnzones uit het handboek</h2><p><strong>0–2 Veilig</strong> · <strong>&gt;2–5 Acceptabel</strong> · <strong>&gt;5–10 Vermijd</strong>.</p><p class="warning">Bij een score boven 5, of verhoogde pijn die langer dan 24 uur aanhoudt, adviseert het handboek het programma met de fysiotherapeut te bespreken.</p></div>
+        <div class="card">
+          <h2>Beveiliging</h2>
+          <label>Nieuwe pincode<input id="newPin" type="password" inputmode="numeric" minlength="4" maxlength="8" /></label>
+          <button id="changePin" class="secondary">Pincode wijzigen</button>
+          <button id="lockNow" class="danger">App vergrendelen</button>
+        </div>
+        <div class="card"><h2>Programma</h2><p>Deze versie bevat de oefeningen 1A t/m 4B en de bijbehorende pagina-afbeeldingen uit het aangeleverde GLA:D® Knie/Heup-handboek. Tik op een afbeelding om deze groter te bekijken.</p><p>Het handboek noemt per oefening 2–3 sets van 10–15 herhalingen en vier niveaus. Volg voor niveaukeuze en uitvoering de aanwijzingen van je gecertificeerde fysiotherapeut.</p></div>
+      </section>
+    </main>
+  </div>
+  <div id="photoModal" class="modal hidden"><div class="modal-card"><div class="section-head"><h2 id="photoModalTitle">Oefening</h2><button id="closePhoto" class="secondary small">Sluiten</button></div><img alt="GLA:D oefening uit handboek"></div></div>
+  <script src="app.js"></script>
+</body>
+</html>

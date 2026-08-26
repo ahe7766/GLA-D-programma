@@ -1,0 +1,9 @@
+{
+  "name": "GLA:D Trainingslog – testversie 0.2",
+  "short_name": "GLA:D Log",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6f1",
+  "theme_color": "#e9efe8",
+  "description": "Lokale trainingsregistratie voor GLA:D-oefeningen."
+}

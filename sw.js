@@ -1,0 +1,3 @@
+const CACHE='glad-test-v2';
+const ASSETS=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./assets/page-05.png','./assets/page-06.png','./assets/page-07.png','./assets/page-08.png','./assets/page-09.png','./assets/page-10.png','./assets/page-11.png','./assets/page-12.png','./assets/page-13.png','./assets/page-14.png','./assets/page-15.png'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
